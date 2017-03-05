@@ -32,6 +32,8 @@ LOCAL_C_INCLUDES := $(SDL_PATH)/include \
 LOCAL_SRC_FILES := agrunt.cpp airtank.cpp \
            aflock.cpp \
            knife.cpp \
+           shock.cpp \
+           shockrifle.cpp \
            m249.cpp \
            animating.cpp \
            animation.cpp \
