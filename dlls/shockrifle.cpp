@@ -212,7 +212,7 @@ void CShockrifle::PrimaryAttack()
 	flags = 0;
 #endif
 	pev->effects = EF_MUZZLEFLASH;
-	DecalGunshot(&m_trHit, BULLET_PLAYER_MP5);
+
 	EMIT_SOUND( ENT( pev ), CHAN_ITEM, "weapons/shock_fire.wav", 1, ATTN_NORM );
 	SendWeaponAnim( SHOCK_FIRE );
 	//PLAYBACK_EVENT_FULL(flags, m_pPlayer->edict(), m_usShockFire, 0.0, (float *)&g_vecZero, (float *)&g_vecZero, 0.0, 0.0, 0, 0, 0, 0);
