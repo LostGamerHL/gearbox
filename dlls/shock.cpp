@@ -158,7 +158,7 @@ void CShock::Touch(CBaseEntity *pOther)
 	}
 	else
 	{
-		pOther->TakeDamage(pev, pev, gSkillData.monDmgShockroach, DMG_ENERGYBEAM | DMG_ALWAYSGIB);
+		pOther->TakeDamage(pev, pev, 15, DMG_ENERGYBEAM | DMG_ALWAYSGIB);
 	}
 
 
