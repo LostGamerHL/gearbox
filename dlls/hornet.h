@@ -1,6 +1,6 @@
 /***
 *
-*	Copyright (c) 1996-2002, Valve LLC. All rights reserved.
+*	Copyright (c) 1996-2001, Valve LLC. All rights reserved.
 *	
 *	This product contains software technology licensed from Id 
 *	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
@@ -35,31 +35,24 @@ class CHornet : public CBaseMonster
 public:
 	void Spawn( void );
 	void Precache( void );
-	int Classify( void );
-	int IRelationship( CBaseEntity *pTarget );
-	virtual int Save( CSave &save );
-	virtual int Restore( CRestore &restore );
-	static TYPEDESCRIPTION m_SaveData[];
+	int	 Classify ( void );
+	int  IRelationship ( CBaseEntity *pTarget );
+	virtual int		Save( CSave &save );
+	virtual int		Restore( CRestore &restore );
+	static	TYPEDESCRIPTION m_SaveData[];
 
 	void IgniteTrail( void );
-	void EXPORT StartTrack( void );
-	void EXPORT StartDart( void );
-	void EXPORT TrackTarget( void );
-	void EXPORT TrackTouch( CBaseEntity *pOther );
+	void EXPORT StartTrack ( void );
+	void EXPORT StartDart ( void );
+	void EXPORT TrackTarget ( void );
+	void EXPORT TrackTouch ( CBaseEntity *pOther );
 	void EXPORT DartTouch( CBaseEntity *pOther );
-	void EXPORT DieTouch( CBaseEntity *pOther );
-	virtual float TouchGravGun( CBaseEntity *attacker, int stage )
-	{
-		pev->owner = attacker->edict();
-		pev->dmg *= 2;
-		if( m_pfnThink == &CBaseEntity::SUB_Remove )
-			pev->nextthink = gpGlobals->time + 1;
-		return 1000;
-	}
-
+	void EXPORT DieTouch ( CBaseEntity *pOther );
+	
 	int TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType );
 
-	float m_flStopAttack;
-	int m_iHornetType;
-	float m_flFlySpeed;
+	float			m_flStopAttack;
+	int				m_iHornetType;
+	float			m_flFlySpeed;
 };
+

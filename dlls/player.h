@@ -1,6 +1,6 @@
 /***
 *
-*	Copyright (c) 1996-2002, Valve LLC. All rights reserved.
+*	Copyright (c) 1996-2001, Valve LLC. All rights reserved.
 *	
 *	This product contains software technology licensed from Id 
 *	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
@@ -15,7 +15,9 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+
 #include "pm_materials.h"
+
 
 #define PLAYER_FATAL_FALL_SPEED		1024// approx 60 feet
 #define PLAYER_MAX_SAFE_FALL_SPEED	580// approx 20 feet
@@ -26,13 +28,18 @@
 //
 // Player PHYSICS FLAGS bits
 //
-#define PFLAG_ONLADDER		( 1<<0 )
-#define PFLAG_ONSWING		( 1<<0 )
-#define PFLAG_ONTRAIN		( 1<<1 )
-#define PFLAG_ONBARNACLE	( 1<<2 )
-#define PFLAG_DUCKING		( 1<<3 )		// In the process of ducking, but totally squatted yet
-#define PFLAG_USING		( 1<<4 )		// Using a continuous entity
-#define PFLAG_OBSERVER		( 1<<5 )		// player is locked in stationary cam mode. Spectators can move, observers can't.
+#define		PFLAG_ONLADDER		( 1<<0 )
+#define		PFLAG_ONSWING		( 1<<0 )
+#define		PFLAG_ONTRAIN		( 1<<1 )
+#define		PFLAG_ONBARNACLE	( 1<<2 )
+#define		PFLAG_DUCKING		( 1<<3 )		// In the process of ducking, but totally squatted yet
+#define		PFLAG_USING			( 1<<4 )		// Using a continuous entity
+#define		PFLAG_OBSERVER		( 1<<5 )		// player is locked in stationary cam mode. Spectators can move, observers can't.
+
+#if defined ( GEARBOX_DLL )
+#define		PFLAG_LATCHING		( 1<<6 )	// Player is latching to a target
+#define		PFLAG_ATTACHED		( 1<<7 )	// Player is attached by a barnacle tongue tip
+#endif
 
 //
 // generic player
@@ -55,8 +62,21 @@
 
 #define CSUITNOREPEAT		32
 
+#if defined ( GEARBOX_DLL )
+#define	SOUND_FLASHLIGHT_ON		"items/flashlight1.wav"
+#define	SOUND_FLASHLIGHT_OFF	"items/flashlight2.wav"
+#else
 #define	SOUND_FLASHLIGHT_ON		"items/flashlight1.wav"
 #define	SOUND_FLASHLIGHT_OFF	"items/flashlight1.wav"
+#endif
+
+#ifdef GEARBOX_CTF
+enum Player_Menu {
+	Team_Menu,
+	Team_Menu_IG,
+};
+#endif
+
 
 #define TEAM_NAME_LENGTH	16
 
@@ -67,7 +87,7 @@ typedef enum
 	PLAYER_JUMP,
 	PLAYER_SUPERJUMP,
 	PLAYER_DIE,
-	PLAYER_ATTACK1
+	PLAYER_ATTACK1,
 } PLAYER_ANIM;
 
 #define MAX_ID_RANGE 2048
@@ -78,36 +98,27 @@ enum sbar_data
 	SBAR_ID_TARGETNAME = 1,
 	SBAR_ID_TARGETHEALTH,
 	SBAR_ID_TARGETARMOR,
-	SBAR_END
+	SBAR_END,
 };
 
 #define CHAT_INTERVAL 1.0f
 
-enum PlayerState
-{
-	STATE_UNINITIALIZED = 0,
-	STATE_CONNECTED,
-	STATE_SPECTATOR_BEGIN,
-	STATE_SPAWNED,
-	STATE_SPECTATOR,
-	STATE_POINT_SELECT
-};
-
-enum PlayerMenuState
-{
-	MENUSTATE_NONE = 0,
-	MENUSTATE_COOPMENU,
-	MENUSTATE_COOPMENU_SPEC,
-	MENUSTATE_CHECKPOINT,
-	MENUSTATE_GLOBAL,
-	MENUSTATE_LOCAL_CONFIRM
-};
-
-#include "whandle.h"
- 
 class CBasePlayer : public CBaseMonster
 {
 public:
+	
+	// Spectator camera
+	void	Observer_FindNextPlayer( bool bReverse );
+	void	Observer_HandleButtons();
+	void	Observer_SetMode( int iMode );
+	void	Observer_CheckTarget();
+	void	Observer_CheckProperties();
+	EHANDLE	m_hObserverTarget;
+	float	m_flNextObserverInput;
+	int		m_iObserverWeapon;	// weapon of current tracked target
+	int		m_iObserverLastMode;// last used observer mode
+	int		IsObserver() { return pev->iuser1; };
+
 	int					random_seed;    // See that is shared between client & server for shared weapons code
 
 	int					m_iPlayerSound;// the index of the sound list slot reserved for this player
@@ -116,20 +127,20 @@ public:
 	int					m_iExtraSoundTypes;// additional classification for this weapon's sound
 	int					m_iWeaponFlash;// brightness of the weapon flash
 	float				m_flStopExtraSoundTime;
-
+	
 	float				m_flFlashLightTime;	// Time until next battery draw/Recharge
 	int					m_iFlashBattery;		// Flashlight Battery Draw
 
 	int					m_afButtonLast;
 	int					m_afButtonPressed;
 	int					m_afButtonReleased;
-
+	
 	edict_t			   *m_pentSndLast;			// last sound entity to modify player room type
 	float				m_flSndRoomtype;		// last roomtype set by sound entity
 	float				m_flSndRange;			// dist from player to sound entity
 
 	float				m_flFallVelocity;
-
+	
 	int					m_rgItems[MAX_ITEMS];
 	int					m_fKnownItem;		// True when a new item needs to be added
 	int					m_fNewAmmo;			// True when a new item has been added
@@ -137,7 +148,8 @@ public:
 	unsigned int		m_afPhysicsFlags;	// physics flags - set when 'normal' physics should be revisited or overriden
 	float				m_fNextSuicideTime; // the time after which the player can next use the suicide command
 
-	// these are time-sensitive things that we keep track of
+
+// these are time-sensitive things that we keep track of
 	float				m_flTimeStepSound;	// when the last stepping sound was made
 	float				m_flTimeWeaponIdle; // when to play another weapon idle animation.
 	float				m_flSwimTime;		// how long player has been underwater
@@ -163,7 +175,7 @@ public:
 	int					m_idrownrestored;		// track drowning damage restored
 
 	int					m_bitsHUDDamage;		// Damage bits for the current fame. These get sent to 
-										// the hude via the DAMAGE message
+												// the hude via the DAMAGE message
 	BOOL				m_fInitHUD;				// True when deferred HUD restart msg needs to be sent
 	BOOL				m_fGameHUDInitialized;
 	int					m_iTrain;				// Train control position
@@ -183,13 +195,11 @@ public:
 	int			m_iClientHideHUD;
 	int			m_iFOV;			// field of view
 	int			m_iClientFOV;	// client's known FOV
-
 	// usable player items 
-	EHBasePlayerItem	m_rgpPlayerItems[MAX_ITEM_TYPES];
-	EHBasePlayerItem m_pActiveItem;
-	EHBasePlayerItem m_pClientActiveItem;  // client version of the active item
-	EHBasePlayerItem m_pLastItem;
-
+	CBasePlayerItem	*m_rgpPlayerItems[MAX_ITEM_TYPES];
+	CBasePlayerItem *m_pActiveItem;
+	CBasePlayerItem *m_pClientActiveItem;  // client version of the active item
+	CBasePlayerItem *m_pLastItem;
 	// shared ammo slots
 	int	m_rgAmmo[MAX_AMMO_SLOTS];
 	int	m_rgAmmoLast[MAX_AMMO_SLOTS];
@@ -209,7 +219,7 @@ public:
 	virtual void Spawn( void );
 	void Pain( void );
 
-	//virtual void Think( void );
+//	virtual void Think( void );
 	virtual void Jump( void );
 	virtual void Duck( void );
 	virtual void PreThink( void );
@@ -223,9 +233,9 @@ public:
 	virtual void StartSneaking( void ) { m_tSneaking = gpGlobals->time - 1; }
 	virtual void StopSneaking( void ) { m_tSneaking = gpGlobals->time + 30; }
 	virtual BOOL IsSneaking( void ) { return m_tSneaking <= gpGlobals->time; }
-	virtual BOOL IsAlive( void ) { return (pev->deadflag == DEAD_NO) && pev->health > 0 || ( pev->flags & FL_SPECTATOR ); }
+	virtual BOOL IsAlive( void ) { return (pev->deadflag == DEAD_NO) && pev->health > 0; }
 	virtual BOOL ShouldFadeOnDeath( void ) { return FALSE; }
-	virtual	BOOL IsPlayer( void ) { return !( pev->flags & FL_SPECTATOR ); }			// Spectators should return FALSE for this, they aren't "players" as far as game logic is concerned
+	virtual	BOOL IsPlayer( void ) { return TRUE; }			// Spectators should return FALSE for this, they aren't "players" as far as game logic is concerned
 
 	virtual BOOL IsNetClient( void ) { return TRUE; }		// Bots should return FALSE for this, they can't receive NET messages
 															// Spectators should return TRUE for this
@@ -247,10 +257,10 @@ public:
 	virtual int		ObjectCaps( void ) { return CBaseMonster :: ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
 	virtual void	Precache( void );
 	BOOL			IsOnLadder( void );
-	BOOL			FlashlightIsOn( void );
-	void			FlashlightTurnOn( void );
-	void			FlashlightTurnOff( void );
-
+	virtual BOOL	FlashlightIsOn( void );
+	virtual void	FlashlightTurnOn(void);
+	virtual void	FlashlightTurnOff(void);
+	
 	void UpdatePlayerSound ( void );
 	void DeathSound ( void );
 
@@ -319,7 +329,7 @@ public:
 	float m_flAmmoStartCharge;
 	float m_flPlayAftershock;
 	float m_flNextAmmoBurn;// while charging, when to absorb another unit of player's ammo?
-
+	
 	//Player ID
 	void InitStatusBar( void );
 	void UpdateStatusBar( void );
@@ -328,25 +338,63 @@ public:
 	float m_flStatusBarDisappearDelay;
 	char m_SbarString0[ SBAR_STRING_SIZE ];
 	char m_SbarString1[ SBAR_STRING_SIZE ];
-
+	
 	float m_flNextChatTime;
 
-	virtual float TouchGravGun( CBaseEntity *attacker, int stage );
-	float m_flSpawnTime;
-	PlayerState m_state;
-	bool m_fTouchMenu;
-	int m_iMenuState;
-	int m_iLocalConfirm;
-	int m_iConfirmKey;
-	int m_iEnttoolsMonsters;
-	float m_fEnttoolsMonsterTime;
-	virtual void Touch( CBaseEntity *pOther );
+#if defined ( GEARBOX_DLL )
+	//
+	// Op4 player attributes.
+	//
+	BOOL	m_fInXen;
+	BOOL	m_fIsFrozen;
+
+	friend class CDisplacer;
+	friend class CTriggerXenReturn;
+	friend class CPlayerFreeze;
+#endif
+
+
+#if defined ( GEARBOX_CTF )
+	//
+	// Op4 CTF player attributes.
+	//
+	int		m_bHasFlag;
+	void ShowMenu(int bitsValidSlots, int nDisplayTime, BOOL fNeedMore, char *pszText);
+	int     m_iMenu;
+
+	float	m_flNextTeamChange;
+
+	CBasePlayer *pFlagCarrierKiller;
+	CBasePlayer *pFlagReturner;
+	CBasePlayer *pCarrierHurter;
+
+	float	m_flCarrierHurtTime;
+	float	m_flCarrierPickupTime;
+	float	m_flFlagCarrierKillTime;
+	float	m_flFlagReturnTime;
+	float	m_flFlagStatusTime;
+
+	float	m_flRegenTime;
+
+	int		m_iRuneStatus;
+
+	void	W_FireHook(void);
+	void	Throw_Grapple(void);
+
+	bool	m_bHook_Out;
+	bool    m_bOn_Hook;
+	CBaseEntity *m_ppHook;
+
+	void Service_Grapple(void);
+#endif
+	
 };
 
 #define AUTOAIM_2DEGREES  0.0348994967025
 #define AUTOAIM_5DEGREES  0.08715574274766
 #define AUTOAIM_8DEGREES  0.1391731009601
 #define AUTOAIM_10DEGREES 0.1736481776669
+
 
 extern int	gmsgHudText;
 extern BOOL gInitHUD;

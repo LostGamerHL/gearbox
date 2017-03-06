@@ -1,6 +1,6 @@
 /***
 *
-*	Copyright (c) 1996-2002, Valve LLC. All rights reserved.
+*	Copyright (c) 1996-2001, Valve LLC. All rights reserved.
 *	
 *	This product contains software technology licensed from Id 
 *	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
@@ -88,6 +88,7 @@ public:
 	float	m_flWeight;// length of the link line segment
 };
 
+
 typedef struct
 {
 	int m_SortedBy[3];
@@ -104,7 +105,6 @@ typedef struct
 // CGraph 
 //=========================================================
 #define	GRAPH_VERSION	(int)16// !!!increment this whever graph/node/link classes change, to obsolesce older disk files.
-
 class CGraph
 {
 public:
@@ -116,7 +116,7 @@ public:
 
 	CNode	*m_pNodes;// pointer to the memory block that contains all node info
 	CLink	*m_pLinkPool;// big list of all node connections
-	signed char    *m_pRouteInfo; // compressed routing information the nodes use.
+	char    *m_pRouteInfo; // compressed routing information the nodes use.
 
 	int		m_cNodes;// total number of nodes
 	int		m_cLinks;// total number of links
@@ -269,6 +269,7 @@ class CNodeEnt : public CBaseEntity
 	short m_sHintActivity;
 };
 
+
 //=========================================================
 // CStack - last in, first out.
 //=========================================================
@@ -287,6 +288,7 @@ private:
 	int		m_stack[ MAX_STACK_NODES ];
 	int		m_level;
 };
+
 
 //=========================================================
 // CQueue - first in, first out.
@@ -366,7 +368,7 @@ enum
 	HINT_TACTICAL_AMBUSH,
 
 	HINT_STUKA_PERCH = 300,
-	HINT_STUKA_LANDING
+	HINT_STUKA_LANDING,
 };
 
 extern CGraph WorldGraph;

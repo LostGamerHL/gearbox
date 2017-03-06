@@ -1,6 +1,6 @@
 /***
 *
-*	Copyright (c) 1996-2002, Valve LLC. All rights reserved.
+*	Copyright (c) 1996-2001, Valve LLC. All rights reserved.
 *	
 *	This product contains software technology licensed from Id 
 *	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
@@ -34,7 +34,7 @@ enum SS_INTERRUPT
 {
 	SS_INTERRUPT_IDLE = 0,
 	SS_INTERRUPT_BY_NAME,
-	SS_INTERRUPT_AI
+	SS_INTERRUPT_AI,
 };
 
 // when a monster finishes an AI scripted sequence, we can choose
@@ -91,7 +91,7 @@ public:
 	int	m_saved_movetype;
 	int	m_saved_solid;
 	int m_saved_effects;
-	//Vector m_vecOrigOrigin;
+//	Vector m_vecOrigOrigin;
 	BOOL m_interruptable;
 };
 
@@ -102,4 +102,6 @@ class CCineAI : public CCineMonster
 	BOOL FCanOverrideState ( void );
 	virtual void FixScriptMonsterSchedule( CBaseMonster *pMonster );
 };
-#endif //SCRIPTED_H
+
+
+#endif		//SCRIPTED_H

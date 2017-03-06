@@ -1,9 +1,9 @@
 /***
 *
 *	Copyright (c) 1999, Valve LLC. All rights reserved.
-*
-*	This product contains software technology licensed from Id
-*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc.
+*	
+*	This product contains software technology licensed from Id 
+*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
 *	All Rights Reserved.
 *
 *   Use, distribution, and modification of this source code and/or resulting
@@ -21,20 +21,21 @@
 #include "hud.h"
 #include "cl_util.h"
 #include "parsemsg.h"
-#include "kbutton.h"
-#include "triangleapi.h"
+
 #include <string.h>
 #include <stdio.h>
 
-DECLARE_MESSAGE( m_MOTD, MOTD )
+//DECLARE_MESSAGE( m_MOTD, MOTD );
 
-int CHudMOTD::Init( void )
+int CHudMOTD::MOTD_DISPLAY_TIME;
+
+int CHudMOTD :: Init( void )
 {
 	gHUD.AddHudElem( this );
 
-	HOOK_MESSAGE( MOTD );
+	// HOOK_MESSAGE( MOTD );
 
-	m_bShow = false;
+	CVAR_CREATE( "motd_display_time", "15", 0 );
 
 	m_iFlags &= ~HUD_ACTIVE;  // start out inactive
 	m_szMOTD[0] = 0;
@@ -42,87 +43,89 @@ int CHudMOTD::Init( void )
 	return 1;
 }
 
-int CHudMOTD::VidInit( void )
+int CHudMOTD :: VidInit( void )
 {
 	// Load sprites here
+
 	return 1;
 }
 
-void CHudMOTD::Reset( void )
+void CHudMOTD :: Reset( void )
 {
 	m_iFlags &= ~HUD_ACTIVE;  // start out inactive
 	m_szMOTD[0] = 0;
 	m_iLines = 0;
-	m_bShow = 0;
+	m_flActiveRemaining = 0;
 }
 
 #define LINE_HEIGHT  13
-#define ROW_GAP  13
-#define ROW_RANGE_MIN 30
-#define ROW_RANGE_MAX ( ScreenHeight - 100 )
-int CHudMOTD::Draw( float fTime )
+
+int CHudMOTD :: Draw( float fTime )
 {
-	gHUD.m_iNoConsolePrint &= ~( 1 << 1 );
-	if( !m_bShow )
+	static float sfLastTime;
+	float fElapsed;
+
+	// Draw MOTD line-by-line
+	if ( m_flActiveRemaining <= 0.0 )
+	{ 
+		// finished with MOTD, disable it
+		m_szMOTD[0] = 0;
+		m_iLines = 0;
+		m_iFlags &= ~HUD_ACTIVE;
+		m_flActiveRemaining = 0.0;
 		return 1;
-	gHUD.m_iNoConsolePrint |= 1 << 1;
-	bool bScroll;
-	// find the top of where the MOTD should be drawn,  so the whole thing is centered in the screen
-	int ypos = ( ScreenHeight - LINE_HEIGHT * m_iLines ) / 2; // shift it up slightly
-	char *ch = m_szMOTD;
-	int xpos = ( ScreenWidth - gHUD.m_scrinfo.charWidths['M'] * m_iMaxLength ) / 2;
-	if( xpos < 30 )
-		xpos = 30;
-	int xmax = xpos + gHUD.m_scrinfo.charWidths['M'] * m_iMaxLength;
-	int height = LINE_HEIGHT * m_iLines;
-	int ypos_r=ypos;
-	if( height > ROW_RANGE_MAX )
-	{
-		ypos = ROW_RANGE_MIN + 7 + scroll;
-		if( ypos  > ROW_RANGE_MIN + 4 )
-			scroll-= ( ypos - ( ROW_RANGE_MIN + 4 ) ) / 3.0;
-		if( ypos + height < ROW_RANGE_MAX )
-			scroll+= ( ROW_RANGE_MAX - ( ypos + height ) ) / 3.0;
-		ypos_r = ROW_RANGE_MIN;
-		height = ROW_RANGE_MAX;
 	}
-	int ymax = ypos + height;
-	if( xmax > ScreenWidth - 30 ) xmax = ScreenWidth - 30;
-	gHUD.DrawDarkRectangle( xpos - 5, ypos_r - 5, xmax - xpos + 10, height + 10 );
-	while( *ch )
+
+	fElapsed = gHUD.m_flTime - sfLastTime;
+
+	// Don't let time go negative ( level transition? )
+	fElapsed = max( 0.0, fElapsed );
+	// Don't let time go hugely positive ( first connection to active server ? )
+	fElapsed = min( 1.0, fElapsed );
+
+	// Remember last timestamp
+	sfLastTime = gHUD.m_flTime;
+
+	// Remove a bit of time
+	m_flActiveRemaining -= fElapsed;
+
+	// find the top of where the MOTD should be drawn,  so the whole thing is centered in the screen
+	int ypos = max(((ScreenHeight - (m_iLines * LINE_HEIGHT)) / 2) - 40, 30 ); // shift it up slightly
+	char *ch = m_szMOTD;
+	while ( *ch )
 	{
-		char *next_line;
 		int line_length = 0;  // count the length of the current line
-		for( next_line = ch; *next_line != '\n' && *next_line != 0; next_line++ )
-			line_length += gHUD.m_scrinfo.charWidths[*next_line];
+		for ( char *next_line = ch; *next_line != '\n' && *next_line != 0; next_line++ )
+			line_length += gHUD.m_scrinfo.charWidths[ *next_line ];
 		char *top = next_line;
-		if( *top == '\n' )
+		if ( *top == '\n' )
 			*top = 0;
 		else
 			top = NULL;
 
 		// find where to start drawing the line
-		if( ( ypos > ROW_RANGE_MIN ) && ( ypos + LINE_HEIGHT <= ypos_r + height ) )
-			gHUD.DrawHudString( xpos, ypos, xmax, ch, 255, 180, 0 );
+		int xpos = (ScreenWidth - line_length) / 2;
+
+		gHUD.DrawHudString( xpos, ypos, ScreenWidth, ch, 255, 180, 0 );
 
 		ypos += LINE_HEIGHT;
 
-		if( top )  // restore
+		if ( top )  // restore 
 			*top = '\n';
 		ch = next_line;
-		if( *ch == '\n' )
+		if ( *ch == '\n' )
 			ch++;
 
-		if( ypos > ( ScreenHeight - 20 ) )
+		if ( ypos > (ScreenHeight - 20) )
 			break;  // don't let it draw too low
 	}
-
+	
 	return 1;
 }
 
-int CHudMOTD::MsgFunc_MOTD( const char *pszName, int iSize, void *pbuf )
+int CHudMOTD :: MsgFunc_MOTD( const char *pszName, int iSize, void *pbuf )
 {
-	if( m_iFlags & HUD_ACTIVE )
+	if ( m_iFlags & HUD_ACTIVE )
 	{
 		Reset(); // clear the current MOTD in prep for this one
 	}
@@ -130,37 +133,23 @@ int CHudMOTD::MsgFunc_MOTD( const char *pszName, int iSize, void *pbuf )
 	BEGIN_READ( pbuf, iSize );
 
 	int is_finished = READ_BYTE();
-	strncat( m_szMOTD, READ_STRING(), sizeof(m_szMOTD) - 1 );
+	strcat( m_szMOTD, READ_STRING() );
 
-	if( is_finished )
+	if ( is_finished )
 	{
-		int length = 0;
-
-		m_iMaxLength = 0;
 		m_iFlags |= HUD_ACTIVE;
 
-		for( char *sz = m_szMOTD; *sz != 0; sz++ )  // count the number of lines in the MOTD
-		{
-			if( *sz == '\n' )
-			{
-				m_iLines++;
-				if( length > m_iMaxLength )
-				{
-					m_iMaxLength = length;
-					length = 0;
-				}
-			}
-			length++;
-		}
+		MOTD_DISPLAY_TIME = max( 10, CVAR_GET_FLOAT( "motd_display_time" ) );
 
-		m_iLines++;
-		if( length > m_iMaxLength )
+		m_flActiveRemaining = MOTD_DISPLAY_TIME;
+
+		for ( char *sz = m_szMOTD; *sz != 0; sz++ )  // count the number of lines in the MOTD
 		{
-			m_iMaxLength = length;
-			length = 0;
+			if ( *sz == '\n' )
+				m_iLines++;
 		}
-		m_bShow = true;
 	}
 
 	return 1;
 }
+

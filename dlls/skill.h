@@ -1,6 +1,6 @@
 /***
 *
-*	Copyright (c) 1996-2002, Valve LLC. All rights reserved.
+*	Copyright (c) 1996-2001, Valve LLC. All rights reserved.
 *	
 *	This product contains software technology licensed from Id 
 *	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
@@ -18,14 +18,15 @@
 
 struct skilldata_t
 {
+
 	int iSkillLevel; // game skill level
 
-	// Monster Health & Damage
+// Monster Health & Damage
 	float	agruntHealth;
 	float agruntDmgPunch;
 
 	float apacheHealth;
-
+	
 	float barneyHealth;
 
 	float bigmommaHealthFactor;		// Multiply each node's health by this
@@ -89,7 +90,8 @@ struct skilldata_t
 	float miniturretHealth;
 	float sentryHealth;
 
-	// Player Weapons
+
+// Player Weapons
 	float plrDmgCrowbar;
 	float plrDmg9MM;
 	float plrDmg357;
@@ -107,32 +109,121 @@ struct skilldata_t
 	float plrDmgSatchel;
 	float plrDmgTripmine;
 	
-	// weapons shared by monsters
+// weapons shared by monsters
 	float monDmg9MM;
 	float monDmgMP5;
 	float monDmg12MM;
 	float monDmgHornet;
 
-	// health/suit charge
+// health/suit charge
 	float suitchargerCapacity;
 	float batteryCapacity;
 	float healthchargerCapacity;
 	float healthkitCapacity;
 	float scientistHeal;
 
-	// monster damage adj
+// monster damage adj
 	float monHead;
 	float monChest;
 	float monStomach;
 	float monLeg;
 	float monArm;
 
-	// player damage adj
+// player damage adj
 	float plrHead;
 	float plrChest;
 	float plrStomach;
 	float plrLeg;
 	float plrArm;
+
+#if defined ( GEARBOX_DLL )
+
+// Monster Health & Damage
+	float otisHealth;
+
+	float pitdroneHealth;
+	float pitdroneDmgBite;
+	float pitdroneDmgWhip;
+	float pitdroneDmgSpit;
+
+	float hgruntAllyHealth;
+	float hgruntAllyDmgKick;
+	float hgruntAllyShotgunPellets;
+	float hgruntAllyGrenadeSpeed;
+
+	float medicAllyHealth;
+	float medicAllyDmgKick;
+	float medicAllyGrenadeSpeed;
+	float medicAllyHeal;
+
+	float torchAllyHealth;
+	float torchAllyDmgKick;
+	float torchAllyGrenadeSpeed;
+
+	float massnHealth;
+	float massnDmgKick;
+	float massnGrenadeSpeed;
+
+	float strooperHealth;
+	float strooperDmgKick;
+	float strooperGrenadeSpeed;
+	float strooperMaxCharge;
+	float strooperRchgSpeed;
+
+	float cleansuitScientistHealth;
+	float cleansuitScientistHeal;
+
+	float voltigoreHealth;
+	float voltigoreDmgPunch;
+	float voltigoreDmgBeam;
+
+	float babyVoltigoreHealth;
+	float babyVoltigoreDmgPunch;
+
+	float pwormHealth;
+	float pwormDmgSwipe;
+	float pwormDmgBeam;
+
+	float gwormHealth;
+	float gwormDmgSpit;
+	float gwormDmgHit;
+
+	float zbarneyHealth;
+	float zbarneyDmgOneSlash;
+	float zbarneyDmgBothSlash;
+
+	float zgruntHealth;
+	float zgruntDmgOneSlash;
+	float zgruntDmgBothSlash;
+
+	float gonomeHealth;
+	float gonomeDmgOneSlash;
+	float gonomeDmgGuts;
+	float gonomeDmgOneBite;
+
+	float sroachHealth;
+	float sroachDmgBite;
+	float sroachLifespan;
+
+// Player Weapons
+	float plrDmgPWrench;
+	float plrDmgKnife;
+	float plrDmgGrapple;
+	float plrDmgEagle;
+	float plrDmgDisplacer;
+	float plrDmgShockroach;
+	float plrDmgSpore;
+	float plrDmg762;
+	float plrDmg556;
+
+// weapons shared by monsters
+	float monDmg762;
+	float monDmg556;
+	float monDmgDisplacer;
+	float monDmgShockroach;
+
+	float displacerDmgRadius;
+#endif
 };
 
 extern	DLL_GLOBAL	skilldata_t	gSkillData;

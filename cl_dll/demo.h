@@ -23,4 +23,5 @@ extern int g_demosniperdamage;
 extern float g_demosniperorg[3];
 extern float g_demosniperangles[3];
 extern float g_demozoom;
+
 #endif

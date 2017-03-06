@@ -15,7 +15,6 @@
 //
 // $NoKeywords: $
 //=============================================================================
-
 #include <windows.h>
 #include <dsound.h>
 #include <mmsystem.h>
@@ -29,9 +28,9 @@ extern engine_studio_api_t IEngineStudio;
 
 #define ENGINE_LAUNCHER_API_VERSION 1
 
-LPDIRECTSOUND		lpDS		= NULL;
-LPDIRECTSOUNDBUFFER	lpDSBuf		= NULL;
-LPHWAVEOUT		lpHW		= NULL;
+LPDIRECTSOUND       lpDS		= NULL;
+LPDIRECTSOUNDBUFFER lpDSBuf		= NULL;
+LPHWAVEOUT			lpHW		= NULL;
 
 static HMODULE hEngine = 0;
 
@@ -117,10 +116,10 @@ int Eng_LoadFunctions( HMODULE hMod )
 	engine_api_func pfnEngineAPI;
 	
 	pfnEngineAPI = ( engine_api_func )GetProcAddress( hMod, "Sys_EngineAPI"  );
-	if( !pfnEngineAPI )
+	if ( !pfnEngineAPI )
 		return 0;
 
-	if( !(*pfnEngineAPI)( ENGINE_LAUNCHER_API_VERSION, sizeof( engine_api_t ), &engineapi ) )
+	if ( !(*pfnEngineAPI)( ENGINE_LAUNCHER_API_VERSION, sizeof( engine_api_t ), &engineapi ) )
 		return 0;
 
 	// All is okay
@@ -133,11 +132,11 @@ int Eng_LoadFunctions( HMODULE hMod )
 void LoadSoundAPIs( void )
 {
 	hEngine = ::LoadLibrary( IEngineStudio.IsHardware() ? "hw.dll" : "sw.dll" );
-	if( hEngine )
+	if ( hEngine )
 	{
-		if( Eng_LoadFunctions( hEngine ) )
+		if ( Eng_LoadFunctions( hEngine ) )
 		{
-			if( engineapi.S_GetDSPointer && engineapi.S_GetWAVPointer )
+			if ( engineapi.S_GetDSPointer && engineapi.S_GetWAVPointer )
 			{
 				engineapi.S_GetDSPointer(&lpDS, &lpDSBuf);
 				lpHW = (HWAVEOUT FAR *)engineapi.S_GetWAVPointer();
@@ -156,7 +155,7 @@ void ShutdownSoundAPIs( void )
 		FreeLibrary( hEngine );
 		hEngine = 0;
 	}
-
+	
 	lpDS = 0;
 	lpDSBuf = 0;
 	lpHW = 0;

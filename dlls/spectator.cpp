@@ -1,6 +1,6 @@
 /***
 *
-*	Copyright (c) 1996-2002, Valve LLC. All rights reserved.
+*	Copyright (c) 1996-2001, Valve LLC. All rights reserved.
 *	
 *	This product contains software technology licensed from Id 
 *	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
@@ -18,7 +18,6 @@
 
 // Spectator functions
 // 
-
 #include	"extdll.h"
 #include	"util.h"
 #include	"cbase.h"
@@ -32,12 +31,12 @@ SpectatorConnect
 called when a spectator connects to a server
 ============
 */
-void CBaseSpectator::SpectatorConnect( void )
+void CBaseSpectator::SpectatorConnect(void)
 {
 	pev->flags = FL_SPECTATOR;
 	pev->solid = SOLID_NOT;
 	pev->movetype = MOVETYPE_NOCLIP;
-
+	
 	m_pGoalEnt = NULL;
 }
 
@@ -48,7 +47,7 @@ SpectatorDisconnect
 called when a spectator disconnects from a server
 ============
 */
-void CBaseSpectator::SpectatorDisconnect( void )
+void CBaseSpectator::SpectatorDisconnect(void)
 {
 }
 
@@ -59,14 +58,14 @@ SpectatorImpulseCommand
 Called by SpectatorThink if the spectator entered an impulse
 ================
 */
-void CBaseSpectator::SpectatorImpulseCommand( void )
+void CBaseSpectator::SpectatorImpulseCommand(void)
 {
-	static edict_t *pGoal = NULL;
-	edict_t *pPreviousGoal;
-	edict_t *pCurrentGoal;
-	BOOL bFound;
-
-	switch( pev->impulse )
+	static edict_t	*pGoal		= NULL;
+	edict_t         *pPreviousGoal;
+	edict_t         *pCurrentGoal;
+	BOOL			bFound;
+	
+	switch (pev->impulse)
 	{
 	case 1:
 		// teleport the spectator to the next spawn point
@@ -78,33 +77,33 @@ void CBaseSpectator::SpectatorImpulseCommand( void )
 		//  back around
 
 		bFound = FALSE;
-		while( 1 )
+		while (1)
 		{
-			pCurrentGoal = FIND_ENTITY_BY_CLASSNAME( pCurrentGoal, "info_player_deathmatch" );
+			pCurrentGoal = FIND_ENTITY_BY_CLASSNAME(pCurrentGoal, "info_player_deathmatch");
 			// Looped around, failure
-			if( pCurrentGoal == pPreviousGoal )
+			if (pCurrentGoal == pPreviousGoal)
 			{
-				ALERT( at_console, "Could not find a spawn spot.\n" );
+				ALERT(at_console, "Could not find a spawn spot.\n");
 				break;
 			}
 			// Found a non-world entity, set success, otherwise, look for the next one.
-			if( !FNullEnt( pCurrentGoal ) )
+			if (!FNullEnt(pCurrentGoal))
 			{
 				bFound = TRUE;
 				break;
 			}
 		}
 
-		if( !bFound )  // Didn't find a good spot.
+		if (!bFound)  // Didn't find a good spot.
 			break;
-
+		
 		pGoal = pCurrentGoal;
 		UTIL_SetOrigin( pev, pGoal->v.origin );
 		pev->angles = pGoal->v.angles;
 		pev->fixangle = FALSE;
 		break;
 	default:
-		ALERT( at_console, "Unknown spectator impulse\n" );
+		ALERT(at_console, "Unknown spectator impulse\n");
 		break;
 	}
 
@@ -118,17 +117,17 @@ SpectatorThink
 Called every frame after physics are run
 ================
 */
-void CBaseSpectator::SpectatorThink( void )
+void  CBaseSpectator::SpectatorThink(void)
 {
-	if( !( pev->flags & FL_SPECTATOR ) )
+	if (!(pev->flags & FL_SPECTATOR))
 	{
 		pev->flags = FL_SPECTATOR;
 	}
 
-	pev->solid = SOLID_NOT;
-	pev->movetype = MOVETYPE_NOCLIP;
+	pev->solid	   = SOLID_NOT;
+	pev->movetype  = MOVETYPE_NOCLIP;
 
-	if( pev->impulse )
+	if (pev->impulse)
 		SpectatorImpulseCommand();
 }
 
@@ -145,6 +144,6 @@ void CBaseSpectator::Spawn()
 	pev->flags = FL_SPECTATOR;
 	pev->solid = SOLID_NOT;
 	pev->movetype = MOVETYPE_NOCLIP;
-
+	
 	m_pGoalEnt = NULL;
 }

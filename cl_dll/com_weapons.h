@@ -14,13 +14,9 @@
 #endif
 
 #include "hud_iface.h"
+#include "Exports.h"
 
-extern "C"
-{
-	void _DLLEXPORT HUD_PostRunCmd( struct local_state_s *from, struct local_state_s *to, struct usercmd_s *cmd, int runfuncs, double time, unsigned int random_seed );
-}
-
-void			COM_Log( char *pszFile, char *fmt, ... );
+void			COM_Log( char *pszFile, char *fmt, ...);
 int				CL_IsDead( void );
 
 float			UTIL_SharedRandomFloat( unsigned int seed, float low, float high );
@@ -34,8 +30,9 @@ void			HUD_SetMaxSpeed( const struct edict_s *ed, float speed );
 int				stub_PrecacheModel( char* s );
 int				stub_PrecacheSound( char* s );
 unsigned short	stub_PrecacheEvent( int type, const char *s );
-const char		*stub_NameForFunction( unsigned long function );
-void			stub_SetModel( struct edict_s *e, const char *m );
+const char		*stub_NameForFunction	( uint32 function );
+void			stub_SetModel			( struct edict_s *e, const char *m );
+
 
 extern cvar_t *cl_lw;
 
@@ -43,4 +40,5 @@ extern int g_runfuncs;
 extern vec3_t v_angles;
 extern float g_lastFOV;
 extern struct local_state_s *g_finalstate;
+
 #endif

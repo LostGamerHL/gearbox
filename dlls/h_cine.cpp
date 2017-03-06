@@ -1,6 +1,6 @@
 /***
 *
-*	Copyright (c) 1996-2002, Valve LLC. All rights reserved.
+*	Copyright (c) 1996-2001, Valve LLC. All rights reserved.
 *	
 *	This product contains software technology licensed from Id 
 *	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
@@ -28,6 +28,7 @@
 #include	"monsters.h"
 #include	"decals.h"
 
+
 class CLegacyCineMonster : public CBaseMonster
 {
 public:
@@ -43,13 +44,11 @@ class CCineScientist : public CLegacyCineMonster
 public:
 	void Spawn( void ) { CineSpawn("models/cine-scientist.mdl"); }
 };
-
 class CCine2Scientist : public CLegacyCineMonster
 {
 public:
 	void Spawn( void ) { CineSpawn("models/cine2-scientist.mdl"); }
 };
-
 class CCinePanther : public CLegacyCineMonster
 {
 public:
@@ -90,14 +89,14 @@ public:
 // ********** Scientist SPAWN **********
 //
 
-LINK_ENTITY_TO_CLASS( monster_cine_scientist, CCineScientist )
-LINK_ENTITY_TO_CLASS( monster_cine_panther, CCinePanther )
-LINK_ENTITY_TO_CLASS( monster_cine_barney, CCineBarney )
-LINK_ENTITY_TO_CLASS( monster_cine2_scientist, CCine2Scientist )
-LINK_ENTITY_TO_CLASS( monster_cine2_hvyweapons, CCine2HeavyWeapons )
-LINK_ENTITY_TO_CLASS( monster_cine2_slave, CCine2Slave )
-LINK_ENTITY_TO_CLASS( monster_cine3_scientist, CCine3Scientist )
-LINK_ENTITY_TO_CLASS( monster_cine3_barney, CCine3Barney )
+LINK_ENTITY_TO_CLASS( monster_cine_scientist, CCineScientist );
+LINK_ENTITY_TO_CLASS( monster_cine_panther, CCinePanther );
+LINK_ENTITY_TO_CLASS( monster_cine_barney, CCineBarney );
+LINK_ENTITY_TO_CLASS( monster_cine2_scientist, CCine2Scientist );
+LINK_ENTITY_TO_CLASS( monster_cine2_hvyweapons, CCine2HeavyWeapons );
+LINK_ENTITY_TO_CLASS( monster_cine2_slave, CCine2Slave );
+LINK_ENTITY_TO_CLASS( monster_cine3_scientist, CCine3Scientist );
+LINK_ENTITY_TO_CLASS( monster_cine3_barney, CCine3Barney );
 
 //
 // ********** Scientist SPAWN **********
@@ -130,6 +129,7 @@ void CLegacyCineMonster :: CineSpawn( char *szModel )
 	}
 }
 
+
 //
 // CineStart
 //
@@ -145,7 +145,7 @@ void CLegacyCineMonster :: Use( CBaseEntity *pActivator, CBaseEntity *pCaller, U
 //
 void CLegacyCineMonster :: Die( void )
 {
-	SetThink( &CBaseEntity::SUB_Remove );
+	SetThink( &CLegacyCineMonster::SUB_Remove );
 }
 
 //
@@ -190,7 +190,8 @@ public:
 	void EXPORT BloodGush ( void );
 };
 
-LINK_ENTITY_TO_CLASS( cine_blood, CCineBlood )
+LINK_ENTITY_TO_CLASS( cine_blood, CCineBlood );
+
 
 void CCineBlood :: BloodGush ( void )
 {
@@ -201,20 +202,19 @@ void CCineBlood :: BloodGush ( void )
 	UTIL_MakeVectors(pev->angles);
 	if ( pev->health-- < 0 )
 		REMOVE_ENTITY(ENT(pev));
-	// CHANGE_METHOD ( ENT(pev), em_think, SUB_Remove );
+// CHANGE_METHOD ( ENT(pev), em_think, SUB_Remove );
 
 	if ( RANDOM_FLOAT ( 0 , 1 ) < 0.7 )// larger chance of globs
 	{
 		UTIL_BloodDrips( pev->origin, UTIL_RandomBloodVector(), BLOOD_COLOR_RED, 10 );
 	}
-	else // slim chance of geyser
+	else// slim chance of geyser
 	{
 		UTIL_BloodStream( pev->origin, UTIL_RandomBloodVector(), BLOOD_COLOR_RED, RANDOM_LONG(50, 150) );
 	}
 
 	if ( RANDOM_FLOAT ( 0, 1 ) < 0.75 )
-	{
-		// decals the floor with blood.
+	{// decals the floor with blood.
 		vecSplatDir = Vector ( 0 , 0 , -1 );
 		vecSplatDir = vecSplatDir + (RANDOM_FLOAT(-1,1) * 0.6 * gpGlobals->v_right) + (RANDOM_FLOAT(-1,1) * 0.6 * gpGlobals->v_forward);// randomize a bit
 		UTIL_TraceLine( pev->origin + Vector ( 0, 0 , 64) , pev->origin + vecSplatDir * 256, ignore_monsters, ENT(pev), &tr);
@@ -235,6 +235,7 @@ void CCineBlood :: BloodStart ( CBaseEntity *pActivator, CBaseEntity *pCaller, U
 void CCineBlood :: Spawn ( void )
 {
 	pev->solid = SOLID_NOT;
-	SetUse( &CCineBlood::BloodStart );
+	SetUse ( &CCineBlood::BloodStart );
 	pev->health = 20;//hacked health to count iterations
 }
+

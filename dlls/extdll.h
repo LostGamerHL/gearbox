@@ -1,6 +1,6 @@
 /***
 *
-*	Copyright (c) 1996-2002, Valve LLC. All rights reserved.
+*	Copyright (c) 1996-2001, Valve LLC. All rights reserved.
 *	
 *	This product contains software technology licensed from Id 
 *	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
@@ -14,6 +14,7 @@
 ****/
 #ifndef EXTDLL_H
 #define EXTDLL_H
+
 
 //
 // Global header file for extension DLLs
@@ -31,6 +32,8 @@
 #pragma warning(disable : 4514)		// unreferenced inline function removed
 #pragma warning(disable : 4100)		// unreferenced formal parameter
 
+#include "archtypes.h"     // DAL
+
 // Prevent tons of unused windows definitions
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -38,18 +41,26 @@
 #define NOSERVICE
 #define NOMCX
 #define NOIME
-#define HSPRITE HSPRITE_win32
+#include "winsani_in.h"
 #include "windows.h"
-#undef HSPRITE
+#include "winsani_out.h"
 #else // _WIN32
 #define FALSE 0
 #define TRUE (!FALSE)
-typedef unsigned long ULONG;
+typedef uint32 ULONG;
 typedef unsigned char BYTE;
 typedef int BOOL;
 #define MAX_PATH PATH_MAX
 #include <limits.h>
 #include <stdarg.h>
+#include <string.h> // memset 
+#ifndef min
+#define min(a,b)  (((a) < (b)) ? (a) : (b))
+#endif
+#ifndef max
+#define max(a,b)  (((a) > (b)) ? (a) : (b))
+#define _vsnprintf(a,b,c,d) vsnprintf(a,b,c,d)
+#endif
 #endif //_WIN32
 
 // Misc C-runtime library headers
@@ -58,7 +69,7 @@ typedef int BOOL;
 #include "math.h"
 
 // Header file containing definition of globalvars_t and entvars_t
-typedef unsigned int func_t;
+typedef unsigned int func_t;					//
 typedef unsigned int string_t;				// from engine's pr_comp.h;
 typedef float vec_t;				// needed before including progdefs.h
 
@@ -78,11 +89,5 @@ typedef float vec_t;				// needed before including progdefs.h
 
 // Shared header between the client DLL and the game DLLs
 #include "cdll_dll.h"
-#ifndef min
-#define min(a,b)  (((a) < (b)) ? (a) : (b))
-#endif
-#ifndef max
-#define max(a,b)  (((a) > (b)) ? (a) : (b))
-#endif
 
 #endif //EXTDLL_H
